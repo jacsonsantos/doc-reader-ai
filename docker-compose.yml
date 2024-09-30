@@ -1,0 +1,9 @@
+services:
+  flask-app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - OPENAI_API_KEY=your_openai_api_key_here

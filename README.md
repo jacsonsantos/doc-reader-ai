@@ -1,9 +1,9 @@
 # Como usar API
 
-Execute o código Flask com:
+Para iniciar a API:
 
 ```
-python app.py.
+docker compose up --build
 ```
 
 Envie uma requisição POST para:
