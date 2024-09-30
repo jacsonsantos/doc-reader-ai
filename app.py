@@ -33,6 +33,17 @@ def summarize_text(text):
     summary = response.choices[0].text.strip()
     return summary
 
+# Função para fazer o download do arquivo a partir de uma URL
+def download_file(url):
+    local_filename = url.split('/')[-1]
+    file_path = os.path.join("/tmp", local_filename)
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(file_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    return file_path
+
 # Endpoint para upload do documento
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -68,6 +79,42 @@ def upload_file():
     finally:
         # Apague o arquivo temporário após o processamento
         os.remove(file_path)
+
+# Novo endpoint para receber a URL de um arquivo
+@app.route('/summarize-url', methods=['POST'])
+def summarize_url():
+    data = request.get_json()
+    if not data or 'url' not in data:
+        return jsonify({"error": "Nenhuma URL fornecida"}), 400
+    
+    url = data['url']
+    
+    try:
+        # Faça o download do arquivo a partir da URL
+        file_path = download_file(url)
+        file_name = file_path.split('/')[-1]
+
+        # Identifique o tipo de arquivo (PDF ou DOCX)
+        if file_name.endswith('.pdf'):
+            text = extract_text_from_pdf(file_path)
+        elif file_name.endswith('.docx'):
+            text = extract_text_from_docx(file_path)
+        else:
+            return jsonify({"error": "Formato de arquivo não suportado"}), 400
+
+        # Resuma o texto utilizando o ChatGPT
+        summary = summarize_text(text)
+        
+        # Retorne o resumo
+        return jsonify({"summary": summary})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        # Apague o arquivo temporário após o processamento
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 # Execute o app Flask
 if __name__ == '__main__':
