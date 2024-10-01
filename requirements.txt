@@ -2,3 +2,4 @@ flask
 pypdf
 docx2txt
 openai
+requests

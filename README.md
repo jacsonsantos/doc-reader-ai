@@ -3,7 +3,8 @@
 Para iniciar a API:
 
 ```
-docker compose up --build
+cp .env.example .env
+docker compose --env-file=.env up --build
 ```
 
 Envie uma requisição POST para:

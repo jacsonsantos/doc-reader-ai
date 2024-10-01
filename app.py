@@ -3,6 +3,7 @@ from pypdf import PdfReader
 import docx2txt
 import os
 import openai
+import requests
 
 # Inicialize o Flask
 app = Flask(__name__)
@@ -24,13 +25,16 @@ def extract_text_from_docx(file_path):
 
 # Função para resumir o texto utilizando a API do ChatGPT
 def summarize_text(text):
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f"Resuma o seguinte texto:\n\n{text}",
+    response = openai.chat.completions.create(
+        model = "gpt-4o",
+        messages= [
+            {"role": "system", "content": "Você é um resumidor de conteúdo de documento"},
+            {"role": "user", "content": f"Resuma o seguinte texto:\n\n{text}"}
+        ],
         max_tokens=150,
         temperature=0.5,
     )
-    summary = response.choices[0].text.strip()
+    summary = response.choices[0].message.content.strip()
     return summary
 
 # Função para fazer o download do arquivo a partir de uma URL
@@ -88,7 +92,7 @@ def summarize_url():
         return jsonify({"error": "Nenhuma URL fornecida"}), 400
     
     url = data['url']
-    
+    file_path = ""
     try:
         # Faça o download do arquivo a partir da URL
         file_path = download_file(url)
