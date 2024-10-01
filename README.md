@@ -2,14 +2,14 @@
 
 Para iniciar a API:
 
-```
+```sh
 cp .env.example .env
 docker compose --env-file=.env up --build
 ```
 
 Envie uma requisição POST para:
 
-```
+```sh
 curl -X POST http://localhost:5000/upload \
      -H "Content-Type: multipart/form-data" \
      -F "file=@document.pdf"
@@ -20,7 +20,7 @@ Com um arquivo PDF ou DOCX e receba o resumo do conteúdo.
 
 Envie uma url para resumo do conteúdo
 
-```
+```sh
 curl -X POST http://localhost:5000/summarize-url \
      -H "Content-Type: application/json" \
      -d '{"url": "https://example.com/sample.pdf"}'
@@ -29,7 +29,7 @@ curl -X POST http://localhost:5000/summarize-url \
 
 Resposta da API:
 
-```
+```json
 {
     "summary": "Este é o resumo do conteúdo do documento..."
 }
@@ -40,14 +40,15 @@ Resposta da API:
 Instale a biblioteca `flask-jwt-extended`
 Adicione a dependência no arquivo `requirements.txt`
 
-```
+```sh
 flask-jwt-extended
 ```
 
 **Inicializando o JWT**
+
 No arquivo app.py, importe e configure o JWT:
 
-```
+```python
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 # Inicialize o JWT
@@ -56,9 +57,10 @@ jwt = JWTManager(app)
 ```
 
 **Criando um endpoint para login e geração do token JWT**
+
 Adicione um endpoint de login para gerar o token de acesso JWT. No exemplo abaixo, um token é criado se o nome de usuário e senha forem válidos:
 
-```
+```python
 @app.route('/login', methods=['POST'])
 def login():
     username = request.json.get('username', None)
@@ -74,9 +76,10 @@ def login():
 ```
 
 **Protegendo endpoints com o JWT**
+
 Use o decorador @jwt_required() para proteger qualquer rota que precise de autenticação:
 
-```
+```python
 @app.route('/upload', methods=['POST'])
 @jwt_required()  # Protege o endpoint
 def upload_file():
@@ -86,7 +89,7 @@ def upload_file():
 
 Você também pode proteger o novo endpoint de URL da mesma maneira:
 
-```
+```python
 @app.route('/summarize-url', methods=['POST'])
 @jwt_required()
 def summarize_url():
@@ -95,9 +98,10 @@ def summarize_url():
 ```
 
 **Como testar com curl**
+
 Primeiro, faça login para obter o token JWT:
 
-```
+```sh
 curl -X POST http://localhost:5000/login \
      -H "Content-Type: application/json" \
      -d '{"username": "admin", "password": "senha123"}'
@@ -105,7 +109,7 @@ curl -X POST http://localhost:5000/login \
 
 Isso retornará um token JWT como:
 
-```
+```json
 {
   "access_token": "seu_token_jwt_aqui"
 }
@@ -113,7 +117,7 @@ Isso retornará um token JWT como:
 
 Agora, use o token JWT para autenticar a requisição aos endpoints protegidos:
 
-```
+```sh
 curl -X POST http://localhost:5000/upload \
      -H "Authorization: Bearer seu_token_jwt_aqui" \
      -F "file=@document.pdf"
