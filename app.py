@@ -120,6 +120,11 @@ def summarize_url():
         if os.path.exists(file_path):
             os.remove(file_path)
 
+# Endpoint para upload do documento
+@app.route('/health-check', methods=['GET'])
+def health_check():
+    return jsonify({"health_check": True})
+
 # Execute o app Flask
 if __name__ == '__main__':
     app.run(debug=True)

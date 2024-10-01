@@ -7,6 +7,20 @@ cp .env.example .env
 docker compose --env-file=.env up --build
 ```
 
+**Health Check API**
+
+```sh
+curl --location --request GET 'http://localhost:5000/health-check'
+```
+
+Retorno
+
+```json
+{
+    "health_check": true
+}
+```
+
 Envie uma requisição POST para:
 
 ```sh
